@@ -12,3 +12,33 @@ This project implements a hybrid attendance system using fingerprint authenticat
 7. **Handle hijab/niqab cases** by verifying entry and exit with fingerprint authentication.
 
 See scripts in the `scripts/` folder for each step.
+
+## Video Attendance Demo
+
+Place the classroom video at:
+
+```text
+dataset/test_videos/classroom_demo.mp4
+```
+
+Run the demo from the project root:
+
+```bash
+python scripts/video_attendance_demo.py
+```
+
+The script processes one frame every 3 seconds, recognizes students with the
+trained FaceNet + SVM model, and generates:
+
+- `attendance_logs/video_frame_presence_log.csv`
+- `attendance_logs/video_final_attendance.csv`
+- `outputs/marked_videos/classroom_demo_marked.mp4`
+
+For each known roll number, attendance is calculated as:
+
+```text
+presence_percentage = detected_frames / total_processed_frames * 100
+```
+
+If the presence percentage is at least 70%, the student is marked `Present`.
+Otherwise, the student is marked `Absent`.

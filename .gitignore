@@ -9,10 +9,12 @@ __pycache__/
 *.pyd
 
 # Dataset raw images - do not upload private/original student images
-dataset/raw/
-dataset/resized/
-dataset/rejected/
-dataset/test_images/
+# dataset/raw/
+# dataset/resized/
+# dataset/rejected/
+# dataset/test_images/
+
+
 
 
 

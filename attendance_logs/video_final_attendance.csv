@@ -1,0 +1,3 @@
+student_id,detected_frames,total_processed_frames,presence_percentage,threshold_percentage,status
+22102001,1,5,20.0,70.0,Absent
+22102024,5,5,100.0,70.0,Present
