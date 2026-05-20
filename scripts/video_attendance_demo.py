@@ -25,6 +25,9 @@ EMBEDDING_DETECTOR_BACKEND = "skip"
 FRAME_INTERVAL_SECONDS = 3
 CONFIDENCE_THRESHOLD = 50.0
 ATTENDANCE_THRESHOLD = 70.0
+MIN_PRESENT_PERCENTAGE = 60.0
+ATTENDANCE_MODE = "percentage"
+ATTENDANCE_MODES = ("percentage", "any")
 
 DEFAULT_VIDEO_PATH = BASE_DIR / "dataset" / "test_videos" / "classroom_demo.mp4"
 CLASSIFIER_PATH = BASE_DIR / "models" / "face_classifier.pkl"
@@ -65,7 +68,17 @@ def parse_args():
         "--attendance-threshold",
         type=float,
         default=ATTENDANCE_THRESHOLD,
-        help="Presence percentage required for Present status. Default: 70",
+        help="Presence percentage required for Present status in percentage mode. Default: 70",
+    )
+    parser.add_argument(
+        "--attendance-mode",
+        choices=ATTENDANCE_MODES,
+        default=ATTENDANCE_MODE,
+        help=(
+            "Attendance mode: 'percentage' uses threshold percentage, "
+            "'any' marks Present if the student is detected in any processed frame. "
+            "Default: percentage"
+        ),
     )
     return parser.parse_args()
 
@@ -270,7 +283,13 @@ def draw_frame_info(frame, video_frame_index, processed_frame_no, is_processed_f
     )
 
 
-def create_final_attendance(known_students, detected_counts, total_processed_frames, threshold):
+def create_final_attendance(
+    known_students,
+    detected_counts,
+    total_processed_frames,
+    threshold,
+    mode,
+):
     rows = []
 
     for student_id in known_students:
@@ -280,7 +299,13 @@ def create_final_attendance(known_students, detected_counts, total_processed_fra
         else:
             presence_percentage = 0.0
 
-        status = "Present" if presence_percentage >= threshold else "Absent"
+        if mode == "any":
+            status = "Present" if detected_frames > 0 else "Absent"
+            threshold_percentage = 0.0
+        else:
+            effective_threshold = min(threshold, MIN_PRESENT_PERCENTAGE)
+            status = "Present" if presence_percentage >= effective_threshold else "Absent"
+            threshold_percentage = float(threshold)
 
         rows.append(
             {
@@ -288,7 +313,8 @@ def create_final_attendance(known_students, detected_counts, total_processed_fra
                 "detected_frames": detected_frames,
                 "total_processed_frames": int(total_processed_frames),
                 "presence_percentage": round(presence_percentage, 2),
-                "threshold_percentage": float(threshold),
+                "threshold_percentage": threshold_percentage,
+                "attendance_mode": mode,
                 "status": status,
             }
         )
@@ -305,6 +331,7 @@ def process_video(
     frame_interval_seconds,
     confidence_threshold,
     attendance_threshold,
+    attendance_mode,
 ):
     video_capture = cv2.VideoCapture(str(input_video_path))
     if not video_capture.isOpened():
@@ -342,8 +369,8 @@ def process_video(
     print(f"Processing one frame every {frame_interval_seconds} seconds")
     print(f"Frame step: {frame_step}")
     print(f"Detector backend: {detector_backend}")
+    print(f"Attendance mode: {attendance_mode}")
     print()
-
     detected_counts = defaultdict(int)
     frame_log_rows = []
     processed_frame_no = 0
@@ -427,6 +454,7 @@ def process_video(
         detected_counts=detected_counts,
         total_processed_frames=processed_frame_no,
         threshold=attendance_threshold,
+        mode=attendance_mode,
     )
 
     frame_log_df.to_csv(FRAME_LOG_PATH, index=False)
@@ -466,6 +494,7 @@ def main():
         frame_interval_seconds=args.frame_interval,
         confidence_threshold=args.confidence_threshold,
         attendance_threshold=args.attendance_threshold,
+        attendance_mode=args.attendance_mode,
     )
 
 

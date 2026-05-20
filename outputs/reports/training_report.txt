@@ -2,21 +2,35 @@ FaceNet + SVM Training Report
 =============================
 
 Model Name: Facenet
-Total Embeddings: 91
-Training Samples: 72
-Testing Samples: 19
-Accuracy: 94.74%
+Total Embeddings: 423
+Training Samples: 338
+Testing Samples: 85
+Accuracy: 95.29%
 
 Classification Report:
               precision    recall  f1-score   support
 
-    22102001       0.86      1.00      0.92         6
+    22102001       0.83      1.00      0.91         5
+    22102013       1.00      0.83      0.91        12
+    22102017       0.93      1.00      0.96        13
+    22102023       0.82      0.90      0.86        10
     22102024       1.00      0.92      0.96        13
+    22102025       1.00      1.00      1.00         8
+    22102026       1.00      1.00      1.00         8
+    22102027       1.00      1.00      1.00         9
+    22102029       1.00      1.00      1.00         7
 
-    accuracy                           0.95        19
-   macro avg       0.93      0.96      0.94        19
-weighted avg       0.95      0.95      0.95        19
+    accuracy                           0.95        85
+   macro avg       0.95      0.96      0.96        85
+weighted avg       0.96      0.95      0.95        85
 
 Confusion Matrix:
-[[ 6  0]
- [ 1 12]]
+[[ 5  0  0  0  0  0  0  0  0]
+ [ 0 10  0  2  0  0  0  0  0]
+ [ 0  0 13  0  0  0  0  0  0]
+ [ 0  0  1  9  0  0  0  0  0]
+ [ 1  0  0  0 12  0  0  0  0]
+ [ 0  0  0  0  0  8  0  0  0]
+ [ 0  0  0  0  0  0  8  0  0]
+ [ 0  0  0  0  0  0  0  9  0]
+ [ 0  0  0  0  0  0  0  0  7]]
