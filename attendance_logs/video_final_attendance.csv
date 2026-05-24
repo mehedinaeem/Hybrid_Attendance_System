@@ -1,10 +1,11 @@
 student_id,detected_frames,total_processed_frames,presence_percentage,threshold_percentage,attendance_mode,status
-22102001,1,20,5.0,70.0,percentage,Absent
-22102013,14,20,70.0,70.0,percentage,Present
+22102001,0,20,0.0,70.0,percentage,Absent
+22102013,13,20,65.0,70.0,percentage,Present
 22102017,13,20,65.0,70.0,percentage,Present
-22102023,0,20,0.0,70.0,percentage,Absent
+22102023,7,20,35.0,70.0,percentage,Absent
 22102024,0,20,0.0,70.0,percentage,Absent
 22102025,0,20,0.0,70.0,percentage,Absent
 22102026,0,20,0.0,70.0,percentage,Absent
 22102027,1,20,5.0,70.0,percentage,Absent
-22102029,5,20,25.0,70.0,percentage,Absent
+22102029,2,20,10.0,70.0,percentage,Absent
+22102042,1,20,5.0,70.0,percentage,Absent
