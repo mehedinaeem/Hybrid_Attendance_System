@@ -1,6 +1,7 @@
 # video_attendance_demo.py
 # Video-based attendance demo using FaceNet embeddings and the trained SVM model.
 import argparse
+import os
 from collections import defaultdict
 from pathlib import Path
 
@@ -8,7 +9,6 @@ import cv2
 import joblib
 import numpy as np
 import pandas as pd
-from deepface import DeepFace
 
 
 # --------------------------------------------------
@@ -16,6 +16,7 @@ from deepface import DeepFace
 # --------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[1]
+os.environ.setdefault("DEEPFACE_HOME", str(BASE_DIR))
 
 MODEL_NAME = "Facenet"
 DETECTOR_BACKEND = "opencv"
@@ -25,7 +26,6 @@ EMBEDDING_DETECTOR_BACKEND = "skip"
 FRAME_INTERVAL_SECONDS = 3
 CONFIDENCE_THRESHOLD = 50.0
 ATTENDANCE_THRESHOLD = 70.0
-MIN_PRESENT_PERCENTAGE = 60.0
 ATTENDANCE_MODE = "percentage"
 ATTENDANCE_MODES = ("percentage", "any")
 
@@ -36,6 +36,27 @@ LABEL_ENCODER_PATH = BASE_DIR / "models" / "label_encoder.pkl"
 FRAME_LOG_PATH = BASE_DIR / "attendance_logs" / "video_frame_presence_log.csv"
 FINAL_ATTENDANCE_PATH = BASE_DIR / "attendance_logs" / "video_final_attendance.csv"
 MARKED_VIDEO_PATH = BASE_DIR / "outputs" / "marked_videos" / "classroom_demo_marked.mp4"
+
+DeepFace = None
+
+
+def load_deepface():
+    global DeepFace
+
+    if DeepFace is not None:
+        return DeepFace
+
+    try:
+        from deepface import DeepFace as deepface_client
+    except ImportError as error:
+        raise RuntimeError(
+            "DeepFace could not be imported. This usually means TensorFlow is not "
+            "installed correctly for this Python/Windows/CPU environment. Reinstall "
+            "the pinned dependencies from requirements.txt, then run this script again."
+        ) from error
+
+    DeepFace = deepface_client
+    return DeepFace
 
 
 def parse_args():
@@ -145,7 +166,8 @@ def clamp_face_box(face_area, frame_width, frame_height):
 
 def detect_faces(frame, detector_backend):
     try:
-        return DeepFace.extract_faces(
+        deepface_client = load_deepface()
+        return deepface_client.extract_faces(
             img_path=frame,
             detector_backend=detector_backend,
             enforce_detection=True,
@@ -159,7 +181,8 @@ def detect_faces(frame, detector_backend):
 
 
 def recognize_face(face_crop, classifier, label_encoder, confidence_threshold):
-    result = DeepFace.represent(
+    deepface_client = load_deepface()
+    result = deepface_client.represent(
         img_path=face_crop,
         model_name=MODEL_NAME,
         detector_backend=EMBEDDING_DETECTOR_BACKEND,
@@ -303,8 +326,7 @@ def create_final_attendance(
             status = "Present" if detected_frames > 0 else "Absent"
             threshold_percentage = 0.0
         else:
-            effective_threshold = min(threshold, MIN_PRESENT_PERCENTAGE)
-            status = "Present" if presence_percentage >= effective_threshold else "Absent"
+            status = "Present" if presence_percentage >= threshold else "Absent"
             threshold_percentage = float(threshold)
 
         rows.append(

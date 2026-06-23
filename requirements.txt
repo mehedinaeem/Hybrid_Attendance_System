@@ -4,11 +4,13 @@
 # venv\Scripts\activate
 # pip install -r requirements.txt
 
-opencv-python
-numpy
-pandas
-scikit-learn
-deepface
-tensorflow
-joblib
-matplotlib
+opencv-python==4.10.0.84
+numpy==1.23.5
+pandas==2.2.3
+scikit-learn==1.5.2
+scipy==1.11.4
+deepface==0.0.93
+tensorflow==2.10.1
+keras==2.10.0
+joblib==1.4.2
+matplotlib==3.9.2
