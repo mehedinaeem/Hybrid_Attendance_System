@@ -1,6 +1,7 @@
 # Virtual environment
 venv/
 .venv/
+.python/
 
 # Python cache
 __pycache__/
@@ -13,7 +14,6 @@ __pycache__/
 # dataset/resized/
 # dataset/rejected/
 # dataset/test_images/
-
 
 
 
